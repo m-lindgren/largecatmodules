@@ -74,6 +74,8 @@ jobs:
         run: sudo chown -R 1001:116 .
 
       - if: steps.cache-largecatmodules.outputs.cache-hit == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh extension install actions/gh-actions-cache
 
