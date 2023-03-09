@@ -42,13 +42,10 @@ jobs:
 
       # Grab the cache if available. We tell dune to use $(pwd)/dune-cache/ in
       # the custom_script below.
-      - uses: actions/cache@v3
+      - uses: actions/cache/restore@v3
         with:
           path: dune-cache
-          key: largecatmodules-coq-${{ matrix.coq-version }}-${{ github.run_id }}-${{ github.run_number }}
-          restore-keys: |
-            largecatmodules-coq-${{ matrix.coq-version }}-${{ github.run_id }}
-            largecatmodules-coq-${{ matrix.coq-version }}-
+          key: largecatmodules-coq-${{ matrix.coq-version }}
 
       - name: Build largecatmodules
         uses: coq-community/docker-coq-action@v1
@@ -72,5 +69,11 @@ jobs:
                          --cache=enabled --error-reporting=twice
             endGroup
       - name: Revert permissions
-        if: ${{ always() }}
+        if: always ()
         run: sudo chown -R 1001:116 .
+
+      - uses: actions/cache/save@v3
+        if: always ()
+        with:
+          path: dune-cache
+          key: largecatmodules-coq-${{ matrix.coq-version }}
