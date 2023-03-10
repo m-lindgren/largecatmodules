@@ -85,7 +85,9 @@ jobs:
           COQVER=${{ matrix.coq-version }}
 
           set +e
+          echo "Deleting old cache."
           gh actions-cache delete largecatmodules-coq-$COQVER -R $REPO -B $BRANCH --confirm
+          echo "Done."
 
       - uses: actions/cache/save@v3
         if: always ()
