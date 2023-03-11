@@ -43,6 +43,7 @@ jobs:
       # Grab the cache if available. We tell dune to use $(pwd)/dune-cache/ in
       # the custom_script below.
       - uses: actions/cache/restore@v3
+        id: cache-largecatmodules
         with:
           path: dune-cache
           key: largecatmodules-coq-${{ matrix.coq-version }}
@@ -71,6 +72,22 @@ jobs:
       - name: Revert permissions
         if: always ()
         run: sudo chown -R 1001:116 .
+
+      - if: steps.cache-largecatmodules.outputs.cache-hit == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh extension install actions/gh-actions-cache
+
+          REPO=${{ github.repository }}
+          BRANCH=refs/pull/${{ github.event.pull_request.number }}/merge
+
+          COQVER=${{ matrix.coq-version }}
+
+          set +e
+          echo "Deleting old cache."
+          gh actions-cache delete largecatmodules-coq-$COQVER -R $REPO -B $BRANCH --confirm
+          echo "Done."
 
       - uses: actions/cache/save@v3
         if: always ()
